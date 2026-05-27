@@ -1,0 +1,43 @@
+---
+# ============================================================
+#  Kali Linux – GUI via KasmVNC (clipboard natif)
+#  Accès : https://localhost:6901
+#  Login : kasm_user / (valeur de VNC_PW dans .env)
+#
+#  Copier-coller :
+#    - Chrome/Edge : seamless, ça marche directement
+#    - Firefox     : icône presse-papier en haut à gauche de l'interface
+# ============================================================
+
+services:
+
+  kali:
+    image: kasmweb/kali-rolling-desktop:1.18.0
+    container_name: kali-gui
+    hostname: kali-lab
+    restart: unless-stopped
+    shm_size: 512m
+    networks:
+      - kali-net
+    ports:
+      - "6901:6901"                 # https://localhost:6901
+    environment:
+      - VNC_PW=${VNC_PW:-Changeme!}
+      - VNC_RESOLUTION=1280x768
+      - LANG=fr_FR.UTF-8
+    volumes:
+      - kali-home:/home/kasm-user  # persistance du home utilisateur
+      - ./shared:/shared            # dossier partagé hôte ↔ conteneur
+
+# ── Volumes ──────────────────────────────────────────────────────────────────
+volumes:
+  kali-home:
+    driver: local
+
+# ── Réseau ───────────────────────────────────────────────────────────────────
+networks:
+  kali-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.32.0.0/24
